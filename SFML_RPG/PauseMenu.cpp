@@ -46,6 +46,10 @@ std::map<std::string, Button*>& PauseMenu::getButtons(){
 
 //Functions
 
+const bool PauseMenu::isButtonPressed(const std::string& key) {
+	return this->buttons[key]->isPressed();
+}
+
 void PauseMenu::addButton(const std::string& key, float y, const std::string& text){
 
 	float width = 250.f, height = 50.f;

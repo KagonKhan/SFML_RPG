@@ -6,16 +6,31 @@ State::State(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys
 	this->states = states;
 	this->quit = false;
 	this->paused = false;
+	this->keytime = 0.f;
+	this->keytimeMax = 10.f;
 }
 
 State::~State()
 {
 }
 
-const bool& State::getQuit() const
-{
+
+//Accessors
+const bool& State::getQuit() const {
 	return this->quit;
 }
+
+const bool State::getKeytime() {
+	if (this->keytime >= this->keytimeMax) {
+		this->keytime = 0.f;
+		return true;
+	}
+	return false;
+}
+
+
+//Functions
+
 
 
 void State::updateMousePositions(){
@@ -34,4 +49,9 @@ void State::pauseState(){
 
 void State::unpauseState(){
 	this->paused = false;
+}
+
+void State::updateKeytime(const float& dt){
+	if (this->keytime < this->keytimeMax)
+		this->keytime += 100.f * dt;
 }
