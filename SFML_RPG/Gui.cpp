@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Gui.h"
 
 //Button
@@ -158,7 +159,7 @@ gui::DropDownList::DropDownList(float x, float y, float width, float height,
 				sf::Color(255, 255, 255, 150), sf::Color(255, 255, 255, 200),  sf::Color(20, 20, 20, 50),		// text color idle/hover/active
 				sf::Color(70, 70, 70, 200),	   sf::Color(150, 150, 150, 200),  sf::Color(20, 20, 20, 200),		// background color idle/hover/active
 				sf::Color(70, 70, 70, 0),	   sf::Color(255, 255, 255, 0),    sf::Color(20, 20, 20, 0),		// outline color idle/hover/active
-				i
+				(unsigned short)i
 			)
 		);
 	}

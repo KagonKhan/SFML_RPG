@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "Entity.h"
+
 void Entity::initVariables(){
 	this->movementComponent = nullptr;
 	this->animationComponent = nullptr;

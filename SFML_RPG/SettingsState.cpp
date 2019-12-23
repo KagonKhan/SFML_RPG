@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SettingsState.h"
 
 SettingsState::SettingsState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
@@ -58,20 +59,20 @@ void SettingsState::initKeybinds() {
 void SettingsState::initGui() {
 
 	this->buttons["BACK"] = new gui::Button(
-		this->window->getSize().x / 2, 780.f, 250.f, 50.f,
+		this->window->getSize().x / 2.f, 780.f, 250.f, 50.f,
 		&this->font, "Back", 50,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(70, 70, 70, 0), sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
 	
 	this->buttons["APPLY"] = new gui::Button(
-		this->window->getSize().x / 2 - 250, 780.f, 250.f, 50.f,
+		this->window->getSize().x / 2.f - 250.f, 780.f, 250.f, 50.f,
 		&this->font, "Apply", 50,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(70, 70, 70, 0), sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
 
 	std::string resolutions[] = { "1920x1080","800x600","640x480"};
 
-	this->dropDownLists["RESOLUTION"] = new gui::DropDownList(this->window->getSize().x / 2 - 100, 400, 200, 50, font, resolutions, 3);
+	this->dropDownLists["RESOLUTION"] = new gui::DropDownList(this->window->getSize().x / 2.f - 100.f, 400, 200, 50, font, resolutions, 3);
 
 }
 
