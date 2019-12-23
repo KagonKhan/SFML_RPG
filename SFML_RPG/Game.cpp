@@ -8,6 +8,7 @@ Game::Game(){
 	this->initKeys();
 	this->initStates(); 
 
+
 }
 
 Game::~Game() {
@@ -65,7 +66,15 @@ void Game::initWindow() {
 		this->window = new sf::RenderWindow(window_bounds, title, sf::Style::Titlebar | sf::Style::Close, windowSettings);
 	this->window->setFramerateLimit(framerate_limit);
 	this->window->setVerticalSyncEnabled(vertical_sync_enabled);
+
+
 }
+
+
+
+
+
+
 
 void Game::initKeys() {
 
@@ -88,8 +97,6 @@ void Game::initKeys() {
 void Game::initStates(){
 	this->states.push(new MainMenuState(this->window, &this->supportedKeys, &this->states));
 }
-
-
 
 //Functions
 void Game::updateDt(){

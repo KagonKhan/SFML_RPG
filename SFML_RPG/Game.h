@@ -10,6 +10,8 @@ private:
 	sf::Event sfEvent;
 	sf::Clock dtClock;
 
+
+
 	sf::ContextSettings windowSettings;
 
 	std::vector<sf::VideoMode> videoModes;
@@ -44,6 +46,7 @@ public:
 	void updateDt();
 	void updateSFMLEvents();
 	void update();
+
 
 	//Render
 	void render();

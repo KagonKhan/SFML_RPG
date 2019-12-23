@@ -7,14 +7,16 @@ SettingsState::SettingsState(sf::RenderWindow* window, std::map<std::string, int
 	this->initBackgrounds();
 	this->initFonts();
 	this->initKeybinds();
-	this->initButtons();
+	this->initGui();
 }
 
 SettingsState::~SettingsState() {
-	auto it = this->buttons.begin();
-	for (it; it != buttons.end(); ++it) {
+	for (auto it = this->buttons.begin(); it != buttons.end(); ++it) 
 		delete it->second;
-	}
+
+	for (auto it = this->dropDownLists.begin(); it != dropDownLists.end(); ++it)
+		delete it->second;
+	
 }
 
 //Initializers
@@ -26,7 +28,7 @@ void SettingsState::initBackgrounds() {
 		)
 	);
 
-	if (!this->backgroundTexture.loadFromFile("Resources/images/background/bg1.png")) {
+	if (!this->backgroundTexture.loadFromFile("Resources/images/background/bgLake.png")) {
 		throw"ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 	}
 
@@ -42,7 +44,6 @@ void SettingsState::initFonts() {
 	}
 
 }
-
 void SettingsState::initKeybinds() {
 
 	std::ifstream ifs("Config/mainmenustate_keybinds.ini");
@@ -54,33 +55,53 @@ void SettingsState::initKeybinds() {
 	}
 	ifs.close();
 }
+void SettingsState::initGui() {
 
-void SettingsState::initButtons() {
-
-	this->buttons["EXIT_STATE"] = new Button(500.f, 780.f, 250.f, 50.f,
-		&this->font, "Quit", 50,
+	this->buttons["BACK"] = new gui::Button(
+		this->window->getSize().x / 2, 780.f, 250.f, 50.f,
+		&this->font, "Back", 50,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(70, 70, 70, 0), sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+	
+	this->buttons["APPLY"] = new gui::Button(
+		this->window->getSize().x / 2 - 250, 780.f, 250.f, 50.f,
+		&this->font, "Apply", 50,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(70, 70, 70, 0), sf::Color(150, 150, 150, 0), sf::Color(20, 20, 20, 0));
+
+	std::string resolutions[] = { "1920x1080","800x600","640x480"};
+
+	this->dropDownLists["RESOLUTION"] = new gui::DropDownList(this->window->getSize().x / 2 - 100, 400, 200, 50, font, resolutions, 3);
 
 }
 
 
 
+//Functions
 void SettingsState::updateInput(const float& dt) {
 
 }
 
-void SettingsState::updateButtons() {
+void SettingsState::updateGui(const float& dt) {
 
-	/*Updates buttons in the state and handles functionality*/
-
-	for (auto it : this->buttons)
+	/*Updates gui in the state and handles functionality*/
+	//Buttons
+	for (auto& it : this->buttons)
 		it.second->update(this->mousePosView);
 
 
 	//Quit game
-	if (this->buttons["EXIT_STATE"]->isPressed())
+	if (this->buttons["BACK"]->isPressed())
 		this->endState();
+
+	//Apply changes
+	if (this->buttons["APPLY"]->isPressed())
+		this->endState();
+
+
+	//Drop down lists 
+	for (auto& it : this->dropDownLists)
+		it.second->update(this->mousePosView, dt);
 
 
 }
@@ -88,15 +109,20 @@ void SettingsState::updateButtons() {
 void SettingsState::update(const float& dt) {
 	this->updateMousePositions();
 	this->updateInput(dt);
-
-	this->updateButtons();
+	this->updateGui(dt);
 
 
 
 }
 
-void SettingsState::renderButtons(sf::RenderTarget& target) {
+void SettingsState::renderGui(sf::RenderTarget& target) {
+	
+	//Buttons
 	for (auto it : this->buttons)
+		it.second->render(target);
+
+	//Lists
+	for (auto it : this->dropDownLists)
 		it.second->render(target);
 
 }
@@ -107,6 +133,16 @@ void SettingsState::render(sf::RenderTarget* target) {
 
 	target->draw(this->background);
 
-	this->renderButtons(*target);
+	this->renderGui(*target);
+
+	sf::Text mouseText;
+	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);
+	mouseText.setFont(this->font);
+	mouseText.setCharacterSize(12);
+	std::stringstream ss;
+	ss << this->mousePosView.x << " " << this->mousePosView.y;
+	mouseText.setString(ss.str());
+	target->draw(mouseText);
+
 
 }

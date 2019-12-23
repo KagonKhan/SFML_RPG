@@ -29,12 +29,29 @@ void GameState::initTextures() {
 }
 
 void GameState::initPlayers(){
-	this->player = new Player(1920 / 2 - 100, 1080 / 2 - 100, this->textures["IDLE"]);
+	this->player = new Player(550.f, 800.f, this->textures["IDLE"]);
+}
+
+void GameState::initBackground() {
+	this->background.setSize(
+		sf::Vector2f(
+			static_cast<float>(this->window->getSize().x),
+			static_cast<float>(this->window->getSize().y)
+		)
+	);
+
+	if (!this->backgroundTexture.loadFromFile("Resources/images/background/bgArena.png")) {
+		throw"ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
+	}
+
+	this->background.setTexture(&backgroundTexture);
+
 }
 
 //Constructors
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
 	:State(window, supportedKeys, states){
+	this->initBackground();
 	this->initKeybinds();
 	this->initFonts();
 	this->initTextures();
@@ -106,10 +123,12 @@ void GameState::update(const float& dt){
 void GameState::render(sf::RenderTarget* target){
 	if (!target)
 		target = this->window;
-
+	target->draw(this->background);
 	this->player->render(*target);
 
 	if (this->paused) { //Pause menu render
 		this->pMenu->render(*target);
 	}
+
+
 }

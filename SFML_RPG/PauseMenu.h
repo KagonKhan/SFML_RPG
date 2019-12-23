@@ -15,7 +15,7 @@
 #include <sstream>
 #include <stack>
 #include <map>
-#include "Button.h"
+#include "gui.h"
 
 class PauseMenu
 {
@@ -26,7 +26,7 @@ private:
 	sf::Font& font;
 	sf::Text menuText;
 	
-	std::map<std::string, Button*> buttons;
+	std::map<std::string, gui::Button*> buttons;
 
 public:
 	PauseMenu(sf::RenderWindow& window, sf::Font& font);
@@ -34,7 +34,7 @@ public:
 
 
 	//Accessors
-	std::map<std::string, Button*>& getButtons();
+	std::map<std::string, gui::Button*>& getButtons();
 
 	//Functions
 	const bool isButtonPressed(const std::string& key);

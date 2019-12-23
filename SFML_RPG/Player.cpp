@@ -26,6 +26,7 @@ Player::Player(float x, float y, sf::Texture& texture_sheet){
 	this->animationComponent->addAnimation("ATTACK2", 10.f, 0, 3, 9, 3, 32, 32);
 	this->animationComponent->addAnimation("ATTACK3", 10.f, 0, 4, 9, 4, 32, 32);
 
+	
 }
 
 

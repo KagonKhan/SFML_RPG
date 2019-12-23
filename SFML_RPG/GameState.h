@@ -8,12 +8,16 @@ private:
 	PauseMenu* pMenu;
 	sf::Font font;
 
+	sf::RectangleShape background;
+	sf::Texture backgroundTexture;
+
 	//Functions
 	void initKeybinds();
 	void initTextures();
 	void initPlayers();
 	void initFonts();
 	void initPauseMenu();
+	void initBackground();
 
 public:
 	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
