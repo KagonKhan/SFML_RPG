@@ -17,9 +17,11 @@ void MainMenuState::initBackgrounds(){
 	this->background.setTexture(&backgroundTexture);
 
 }
+
 void MainMenuState::initVariables(){
 
 }
+
 void MainMenuState::initFonts(){
 	if (this->font.loadFromFile("Fonts/Dosis-Light.otf")) {
 	//	throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");

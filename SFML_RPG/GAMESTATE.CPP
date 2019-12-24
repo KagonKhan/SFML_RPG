@@ -25,7 +25,7 @@ void GameState::initPauseMenu(){
 }
 
 void GameState::initTextures() {
-	if (!this->textures["IDLE"].loadFromFile("Resources/images/sprites/player/textureSheet.png"))
+	if (!this->textures["IDLE"].loadFromFile("Resources/images/sprites/player/bigSheet.png"))
 		throw"ERROR::GAMESTATE::COULD_NOT_LOAD_PLAYER_IDLE_TEXTURE";
 }
 
@@ -49,6 +49,12 @@ void GameState::initBackground() {
 
 }
 
+void GameState::initEnemy(){
+	this->enemy = new Enemy(1550.f, 800.f, this->textures["IDLE"]);
+}
+
+
+
 //Constructors
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
 	:State(window, supportedKeys, states){
@@ -58,18 +64,82 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initTextures();
 	this->initPlayers();
 	this->initPauseMenu();
+	this->initButtons();
 }
 
 
 GameState::~GameState(){
 	delete this->player;
 	delete this->pMenu;
+	delete this->enemy;
+
+	auto it = this->buttons.begin();
+	for (it; it != buttons.end(); ++it) {
+		delete it->second;
+	}
 }
 
 
+//BUTTONS
+void GameState::initButtons() {
+
+	this->buttons["ATTACK1"] = new gui::Button(
+		350.f, 10.f, 200.f, 50.f,
+		&this->font, "Attack", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+
+	this->buttons["ENEMY"] = new gui::Button(
+		600.f, 10.f, 200.f, 50.f,
+		&this->font, "Enemy", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+
+	this->buttons["TOWN"] = new gui::Button(
+		850.f, 10.f, 180.f, 50.f,
+		&this->font, "Town", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+
+}
+
+void GameState::updateButtons() {
+
+	/*Updates buttons in the state and handles functionality*/
+
+	for (auto it : this->buttons)
+		it.second->update(this->mousePosView);
+
+	//Attack
+	if (this->buttons["ATTACK1"]->isPressed())
+		;
+
+	//Spawn enemy
+	if (this->buttons["ENEMY"]->isPressed())
+		this->initEnemy();
+
+
+	//Town state
+	if (this->buttons["TOWN"]->isPressed())
+		this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
+
+
+}
+
+void GameState::renderButtons(sf::RenderTarget& target) {
+	for (auto it : this->buttons)
+		it.second->render(target);
+
+}
 
 //Functions
-
+//Pause / Unpause the game
 void GameState::updateInput(const float& dt){
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime()) {
 
@@ -81,6 +151,7 @@ void GameState::updateInput(const float& dt){
 
 }
 
+//Player movement
 void GameState::updatePlayerInput(const float& dt){
 
 	//Update player input
@@ -96,6 +167,7 @@ void GameState::updatePlayerInput(const float& dt){
 	
 }
 
+//Pause Menu Buttons
 void GameState::updatePauseMenuButtons(){
 	if (this->pMenu->isButtonPressed("QUIT"))
 		this->endState();
@@ -103,6 +175,7 @@ void GameState::updatePauseMenuButtons(){
 
 void GameState::update(const float& dt){
 	this->updateInput(dt);
+	this->updateButtons();
 	this->updateMousePositions();
 
 	this->updateKeytime(dt);
@@ -112,6 +185,8 @@ void GameState::update(const float& dt){
 		this->updatePlayerInput(dt);
 
 		this->player->update(dt);
+		if(this->enemy)
+			this->enemy->update(dt);
 	}
 	else {//paused
 		
@@ -127,9 +202,13 @@ void GameState::render(sf::RenderTarget* target){
 	target->draw(this->background);
 	this->player->render(*target);
 
+	if(this->enemy)
+		this->enemy->render(*target);
+
 	if (this->paused) { //Pause menu render
 		this->pMenu->render(*target);
 	}
 
-
+	this->renderButtons(*target);
 }
+
