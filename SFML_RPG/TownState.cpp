@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TownState.h"
+#include "Windows.h"
 
 //Initializers
 void TownState::initBackgrounds() {
@@ -15,7 +16,10 @@ void TownState::initBackgrounds() {
 	}
 
 	this->background.setTexture(&backgroundTexture);
-
+	
+	this->buffer.loadFromFile("Music/soundSnoring.ogg");
+	this->snoreSound.setBuffer(buffer);
+	this->snoreSound.setVolume(1.f);
 }
 
 void TownState::initVariables() {
@@ -24,9 +28,7 @@ void TownState::initVariables() {
 
 void TownState::initFonts() {
 	if (this->font.loadFromFile("Fonts/Dosis-Light.otf"))
-		;//	throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
-	
-
+		;// throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
 }
 
 void TownState::initKeybinds() {}
@@ -47,19 +49,23 @@ void TownState::initButtons() {
 
 }
 
+/*Updates buttons in the state and handles functionality*/
 void TownState::updateButtons() {
 
-	/*Updates buttons in the state and handles functionality*/
 
 	for (auto it : this->buttons)
 		it.second->update(this->mousePosView);
 
 	//Adventure
-	if (this->buttons["ADVENTURE"]->isPressed())
+	if (this->buttons["ADVENTURE"]->isPressed()) {
 		this->endState();
+	}
 
-	if (this->buttons["HEAL"]->isPressed())
-		;
+	if (this->buttons["HEAL"]->isPressed()) {
+		snoreSound.play();
+		Sleep(1000);
+		this->player->fullHeal();
+	}
 		
 }
 

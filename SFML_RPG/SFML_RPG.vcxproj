@@ -160,7 +160,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AttributeComponent.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="GameOverState.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="EditorState.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -184,7 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="AttributeComponent.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="GameOverState.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="EditorState.h" />
     <ClInclude Include="Entity.h" />

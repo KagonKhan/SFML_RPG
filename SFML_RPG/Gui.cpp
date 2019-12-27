@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Gui.h"
+#include "Windows.h"
 
 //Button
 #pragma region Button
@@ -53,11 +54,7 @@ gui::Button::~Button(){
 //ACCESSORS
 
 
-const bool gui::Button::isPressed() const{
-	if (this->buttonState == BTN_ACTIVE)
-		return true;
-	return false;
-}
+
 
 const std::string gui::Button::getText() const
 {
@@ -79,12 +76,17 @@ void gui::Button::setId(const short unsigned id) {
 	this->id = id;
 }
 
+const bool gui::Button::isPressed() {
+	if (this->buttonState == BTN_ACTIVE) {
+		//Sleep(100); //Totally ghetto solution lmao
+		return true;
+	}
+	return false;
+}
 //FUNCTIONS
 void gui::Button::update(const sf::Vector2f& mousePos){
-		
 	//IDLE
 	this->buttonState = BTN_IDLE;
-	
 	//HOVER
 	if (this->shape.getGlobalBounds().contains(mousePos)) {
 		this->buttonState = BTN_HOVER;
@@ -94,7 +96,7 @@ void gui::Button::update(const sf::Vector2f& mousePos){
 			this->buttonState = BTN_ACTIVE;
 		}
 	}
-
+	//COLORING
 	switch (this->buttonState) {
 	case BTN_IDLE:
 		this->shape.setFillColor(this->idleColor);
@@ -120,8 +122,6 @@ void gui::Button::update(const sf::Vector2f& mousePos){
 		break;
 
 	}
-
-
 
 }
 

@@ -7,6 +7,8 @@ class TownState : public State {
 private:
 	//Variables
 
+	sf::Sound snoreSound;
+	sf::SoundBuffer buffer;
 	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
 	sf::Font font;

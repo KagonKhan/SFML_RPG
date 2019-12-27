@@ -8,19 +8,16 @@ Game::Game(){
 	this->initWindow();
 	this->initKeys();
 	this->initStates(); 
-
-
 }
 
 Game::~Game() {
-	/*autodestruct pointer, maybe usage of smart pointers?*/
+	/*autodestruct pointer, maybe usage of smart pointers?/ unique*/
 	delete this->window;
 
 	while (!this->states.empty()) {
 		delete this->states.top();
 		this->states.pop();
 	}
-
 }
 
 //Initializer functions

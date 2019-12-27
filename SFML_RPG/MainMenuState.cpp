@@ -43,6 +43,15 @@ void MainMenuState::initKeybinds() {
 
 void MainMenuState::initButtons(){
 
+	if (!this->bgMusic.openFromFile("Music/bgMusic.ogg"))
+	{
+		//throw "MUSIC NOT OPEN";
+	}
+	this->bgMusic.setLoop(true);
+	this->bgMusic.setVolume(1.f);
+	this->bgMusic.play();
+
+
 	this->buttons["GAME_STATE"] =		new gui::Button(50.f, 480.f, 250.f, 50.f,
 		&this->font, "New Game", 50,
 		sf::Color(255, 255, 255, 200),	sf::Color(120, 120, 120, 250),	sf::Color(20, 20, 20, 50),

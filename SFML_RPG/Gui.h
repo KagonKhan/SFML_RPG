@@ -41,7 +41,7 @@ namespace gui {
 
 
 		//ACCESSORS
-		const bool isPressed() const;
+		const bool isPressed();
 		const std::string getText() const;
 		const short unsigned& getId() const;
 

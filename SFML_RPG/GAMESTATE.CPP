@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameState.h"
+#include "Windows.h"
 //Initializer functions
 void GameState::initKeybinds(){
 
@@ -15,8 +16,7 @@ void GameState::initKeybinds(){
 
 void GameState::initFonts() {
 	if (!this->font.loadFromFile("Fonts/Dosis-Light.otf"))
-		//throw("ERROR::GAMESTATE::COULD NOT LOAD FONT");
-		;
+		throw("ERROR::GAMESTATE::COULD NOT LOAD FONT");	
 }
 
 void GameState::initPauseMenu(){
@@ -30,7 +30,7 @@ void GameState::initTextures() {
 }
 
 void GameState::initPlayers(){
-	this->player = new Player(550.f, 800.f, this->textures["IDLE"]);
+	this->player = new Player(950.f, 800.f, this->textures["IDLE"]);
 }
 
 void GameState::initBackground() {
@@ -49,11 +49,59 @@ void GameState::initBackground() {
 
 }
 
+
 void GameState::initEnemy(){
-	this->enemy = new Enemy(1550.f, 800.f, this->textures["IDLE"]);
+	this->enemy = new Enemy(1050.f, 800.f, this->textures["IDLE"]);
 }
 
+void GameState::initStatBox(){
+	this->statBox.setSize(sf::Vector2f(300.f, 280.f));
+	this->statBox.setPosition(sf::Vector2f(1.f, 1.f));
+	this->statBox.setFillColor(sf::Color::Black);
 
+	this->statBox.setOutlineThickness(1.f);
+	this->statBox.setOutlineColor(sf::Color::White);
+
+
+	std::stringstream ss;
+	ss << this->player->getHp();
+	this->statText.setString(ss.str());
+	this->statText.setFont(this->font);
+	this->statText.setCharacterSize(30);
+	this->statText.setPosition(sf::Vector2f(1.f, 1.f));
+
+}
+
+void GameState::updateStat(const float& dt) {
+
+
+	this->statText.setString(this->player->getStatistics().str());
+	if (this->player->getHp() <= 0.f) 
+		this->player->deathAnimation(dt);
+
+	if (this->enemy && this->enemy->getHp() <= 0.f) {
+		this->enemy->setWasKilled(true);
+		this->enemy->deathAnimation(dt);
+	}
+
+
+
+	if (this->enemy && this->enemy->isAnimationDone("DEATH")) {
+		if (this->enemy->getWasKilled()) {
+			this->player->addExp(1000.f);
+			this->enemy->setWasKilled(false);
+		}
+		delete this->enemy;
+		this->enemy = nullptr;
+	}
+
+	if (this->player->isAnimationDone("DEATH")) {
+
+		Sleep(1000);
+		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
+	}
+	
+}
 
 //Constructors
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
@@ -65,6 +113,10 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initPlayers();
 	this->initPauseMenu();
 	this->initButtons();
+	this->initStatBox();
+
+
+	
 }
 
 
@@ -109,27 +161,31 @@ void GameState::initButtons() {
 
 }
 
-void GameState::updateButtons() {
+void GameState::updateButtons(const float& dt) {
 
 	/*Updates buttons in the state and handles functionality*/
 
-	for (auto it : this->buttons)
-		it.second->update(this->mousePosView);
-
-	//Attack
-	if (this->buttons["ATTACK1"]->isPressed())
-		;
-
-	//Spawn enemy
-	if (this->buttons["ENEMY"]->isPressed())
-		this->initEnemy();
+	
 
 
-	//Town state
-	if (this->buttons["TOWN"]->isPressed())
-		this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
+		for (auto it : this->buttons)
+			it.second->update(this->mousePosView);
+		//Attack
+		if (this->buttons["ATTACK1"]->isPressed() && this->getKeytime())
+			attack();
 
 
+		//Spawn enemy
+		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
+			this->initEnemy();
+
+
+		//Town state
+		if (this->buttons["TOWN"]->isPressed() && this->getKeytime()) {
+			this->enemy = nullptr;
+			this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
+		}
+	
 }
 
 void GameState::renderButtons(sf::RenderTarget& target) {
@@ -139,6 +195,7 @@ void GameState::renderButtons(sf::RenderTarget& target) {
 }
 
 //Functions
+
 //Pause / Unpause the game
 void GameState::updateInput(const float& dt){
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime()) {
@@ -148,7 +205,6 @@ void GameState::updateInput(const float& dt){
 		else
 			this->unpauseState();
 	}
-
 }
 
 //Player movement
@@ -175,9 +231,10 @@ void GameState::updatePauseMenuButtons(){
 
 void GameState::update(const float& dt){
 	this->updateInput(dt);
-	this->updateButtons();
+	this->updateButtons(dt);
+	this->updateStat(dt);
 	this->updateMousePositions();
-
+	
 	this->updateKeytime(dt);
 
 	if (!this->paused) { // Unpaused update
@@ -202,6 +259,8 @@ void GameState::render(sf::RenderTarget* target){
 	target->draw(this->background);
 	this->player->render(*target);
 
+
+
 	if(this->enemy)
 		this->enemy->render(*target);
 
@@ -209,6 +268,24 @@ void GameState::render(sf::RenderTarget* target){
 		this->pMenu->render(*target);
 	}
 
-	this->renderButtons(*target);
+	if (!this->paused) {
+		this->renderButtons(*target);
+		target->draw(this->statBox);
+		target->draw(this->statText);
+	}
+
+	
+
+
+
 }
 
+void GameState::attack() {
+
+	this->player->setIsAttacking();
+	if (this->enemy) {
+		this->enemy->getDamage(this->player->doDamage());
+	}
+
+	
+}
