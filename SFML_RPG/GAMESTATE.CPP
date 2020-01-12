@@ -3,9 +3,7 @@
 #include "Windows.h"
 //Initializer functions
 void GameState::initKeybinds(){
-
 	std::ifstream ifs("Config/gamestate_keybinds.ini");
-
 	if (ifs.is_open()) {
 		std::string key = "", key2 = "";
 		while (ifs >> key >> key2)
@@ -54,6 +52,7 @@ void GameState::initEnemy(){
 	this->enemy = new Enemy(1050.f, 800.f, this->textures["IDLE"]);
 }
 
+/*Sus*/
 void GameState::initStatBox(){
 	this->statBox.setSize(sf::Vector2f(300.f, 280.f));
 	this->statBox.setPosition(sf::Vector2f(1.f, 1.f));
@@ -64,7 +63,7 @@ void GameState::initStatBox(){
 
 
 	std::stringstream ss;
-	ss << this->player->getHp();
+	ss << this->player->getHp();	
 	this->statText.setString(ss.str());
 	this->statText.setFont(this->font);
 	this->statText.setCharacterSize(30);
@@ -79,16 +78,16 @@ void GameState::updateStat(const float& dt) {
 	if (this->player->getHp() <= 0.f) 
 		this->player->deathAnimation(dt);
 
-	if (this->enemy && this->enemy->getHp() <= 0.f) {
-		this->enemy->setWasKilled(true);
+	if (this->enemy && this->enemy->getHp() <= 0) {
 		this->enemy->deathAnimation(dt);
+		this->enemy->setWasKilled(true);
 	}
 
 
 
 	if (this->enemy && this->enemy->isAnimationDone("DEATH")) {
 		if (this->enemy->getWasKilled()) {
-			this->player->addExp(1000.f);
+			this->player->addExp(1000);
 			this->enemy->setWasKilled(false);
 		}
 		delete this->enemy;
@@ -100,7 +99,6 @@ void GameState::updateStat(const float& dt) {
 		Sleep(1000);
 		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
 	}
-	
 }
 
 //Constructors
@@ -159,14 +157,27 @@ void GameState::initButtons() {
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
 	);
 
+	this->buttons["DIE"] = new gui::Button(
+		1100.f, 10.f, 180.f, 50.f,
+		&this->font, "Die", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+
+	this->buttons["CHARACTER_STATE"] = new gui::Button(
+		1350.f, 10.f, 180.f, 50.f,
+		&this->font, "Character", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+
 }
 
 void GameState::updateButtons(const float& dt) {
 
 	/*Updates buttons in the state and handles functionality*/
-
-	
-
 
 		for (auto it : this->buttons)
 			it.second->update(this->mousePosView);
@@ -178,6 +189,12 @@ void GameState::updateButtons(const float& dt) {
 		//Spawn enemy
 		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
 			this->initEnemy();
+
+		if (this->buttons["DIE"]->isPressed() && this->getKeytime())
+			this->player->getDamage(9999999);
+
+		if (this->buttons["CHARACTER_STATE"]->isPressed() && this->getKeytime())
+			this->states->push(new CharacterScreenState(this->window, this->supportedKeys, this->states, this->player));
 
 
 		//Town state
@@ -210,15 +227,6 @@ void GameState::updateInput(const float& dt){
 //Player movement
 void GameState::updatePlayerInput(const float& dt){
 
-	//Update player input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
-		this->player->move(-1.f, 0.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
-		this->player->move(1.f, 0.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
-		this->player->move(0.f, -1.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
-		this->player->move(0.f, 1.f, dt);
 
 	
 }
@@ -273,19 +281,12 @@ void GameState::render(sf::RenderTarget* target){
 		target->draw(this->statBox);
 		target->draw(this->statText);
 	}
-
-	
-
-
-
 }
 
 void GameState::attack() {
 
 	this->player->setIsAttacking();
-	if (this->enemy) {
-		this->enemy->getDamage(this->player->doDamage());
-	}
 
-	
+	if(this->enemy)
+		this->enemy->getDamage(this->player->doDamage());
 }

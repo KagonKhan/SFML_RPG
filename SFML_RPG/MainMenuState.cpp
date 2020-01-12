@@ -23,10 +23,8 @@ void MainMenuState::initVariables(){
 }
 
 void MainMenuState::initFonts(){
-	if (this->font.loadFromFile("Fonts/Dosis-Light.otf")) {
-	//	throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
-	}
-
+	if (!this->font.loadFromFile("Fonts/Dosis-Light.otf")) 
+		throw("ERROR::MAINMENUSTATE::COULD NOT LOAD FONT");
 }
 
 void MainMenuState::initKeybinds() {
@@ -41,16 +39,17 @@ void MainMenuState::initKeybinds() {
 	ifs.close();
 }
 
-void MainMenuState::initButtons(){
-
+void MainMenuState::initMusic() {
 	if (!this->bgMusic.openFromFile("Music/bgMusic.ogg"))
-	{
-		//throw "MUSIC NOT OPEN";
-	}
+		throw "MUSIC NOT OPEN";
+	
 	this->bgMusic.setLoop(true);
 	this->bgMusic.setVolume(1.f);
 	this->bgMusic.play();
 
+}
+
+void MainMenuState::initButtons(){
 
 	this->buttons["GAME_STATE"] =		new gui::Button(50.f, 480.f, 250.f, 50.f,
 		&this->font, "New Game", 50,
@@ -59,11 +58,6 @@ void MainMenuState::initButtons(){
 	
 	this->buttons["SETTINGS_STATE"] =	new gui::Button(50.f, 580.f, 250.f, 50.f,
 		&this->font, "Settings", 50,
-		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
-		sf::Color(70, 70, 70, 0),	sf::Color(150, 150, 150, 0),	sf::Color(20, 20, 20, 0));
-
-	this->buttons["EDITOR_STATE"] =		new gui::Button(50.f, 680.f, 250.f, 50.f,
-		&this->font, "Editor", 50,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(70, 70, 70, 0),	sf::Color(150, 150, 150, 0),	sf::Color(20, 20, 20, 0));
 
@@ -83,6 +77,7 @@ MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, int
 	this->initFonts();
 	this->initKeybinds();
 	this->initButtons();
+	this->initMusic();
 
 } 
 
@@ -114,11 +109,6 @@ void MainMenuState::updateButtons(){
 	//Settings
 	if (this->buttons["SETTINGS_STATE"]->isPressed())
 		this->states->push(new SettingsState(this->window, this->supportedKeys, this->states));
-
-
-	//Editor
-	if (this->buttons["EDITOR_STATE"]->isPressed())
-		this->states->push(new EditorState(this->window, this->supportedKeys, this->states));
 
 	//Quit game
 	if (this->buttons["EXIT_STATE"]->isPressed())

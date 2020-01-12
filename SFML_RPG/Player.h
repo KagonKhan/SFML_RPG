@@ -8,9 +8,8 @@ private:
 
 
 	//Initializer functions
-	void initVariables();
-	void initHpBars();
-	void initComponents();
+	void initComponents(sf::Texture& texture_sheet);
+	void initAnimations();
 
 public:
 	//constructors
@@ -19,13 +18,12 @@ public:
 
 	//Functions
 	virtual void update(const float& dt);
-	virtual void updateAttack(const float& dt);
 	virtual void updateAnimation(const float& dt);
-	void updateHpBar();
+
 
 
 	void fullHeal();
-	void deathAnimation(const float& dt);
+
 	bool isAnimationDone(std::string key) { return this->animationComponent->isDone(key); };
 	void addExp(unsigned amount);
 };

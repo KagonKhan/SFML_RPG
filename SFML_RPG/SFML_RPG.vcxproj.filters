@@ -22,9 +22,6 @@
     <Filter Include="Components">
       <UniqueIdentifier>{f60a29c7-760d-4225-82ca-9733c5935a36}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tile">
-      <UniqueIdentifier>{2224399a-9922-4460-9027-a4cfc6288e1b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{9a25695a-2c05-4cfd-ae53-4a581eb1f012}</UniqueIdentifier>
     </Filter>
@@ -51,29 +48,11 @@
     <ClCompile Include="Player.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="MovementComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="EditorState.cpp">
-      <Filter>States</Filter>
-    </ClCompile>
-    <ClCompile Include="HitboxComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>Tile</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseMenu.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="SettingsState.cpp">
       <Filter>States</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui.cpp">
-      <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Header Files</Filter>
@@ -89,6 +68,15 @@
     </ClCompile>
     <ClCompile Include="AttributeComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseMenu.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterScreenState.cpp">
+      <Filter>States</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,29 +98,11 @@
     <ClInclude Include="Player.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="MovementComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="AnimationComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="EditorState.h">
-      <Filter>States</Filter>
-    </ClInclude>
-    <ClInclude Include="HitboxComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>Tile</Filter>
-    </ClInclude>
-    <ClInclude Include="PauseMenu.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="SettingsState.h">
       <Filter>States</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
@@ -148,6 +118,15 @@
     </ClInclude>
     <ClInclude Include="AttributeComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseMenu.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterScreenState.h">
+      <Filter>States</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

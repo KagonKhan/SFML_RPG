@@ -5,30 +5,29 @@
 Entity::Entity(){
 	this->initVariables();
 	this->initHpBars();
+
 	if (!this->font.loadFromFile("Fonts/Dosis-Light.otf"))
 		throw("ERROR::GAMESTATE::COULD NOT LOAD FONT");
-	this->attacking = false;
+
+	this->createAttributeComponent(0);
 }
 
 
 Entity::~Entity(){
-	delete this->movementComponent;
 	delete this->animationComponent;
-	delete this->hitboxComponent;
 	delete this->attributeComponent;
 }
 
 
 void Entity::initHpBars() {
-	/*this->hpBarMax.setSize(sf::Vector2f(32.f*3.f, 10.f));
-	this->hpBarMax.setPosition(sf::Vector2f(560, 820));
+	this->hpBarMax.setSize(sf::Vector2f(32.f * 3.f, 10.f));
 	this->hpBarMax.setOutlineThickness(1.f);
 	this->hpBarMax.setOutlineColor(sf::Color::White);
 
 	this->hpRatio = 32.f * 3.f;
 
 	this->hpBar.setSize(sf::Vector2f(hpRatio, 10.f));
-	this->hpBar.setPosition(sf::Vector2f(560, 820));
+
 	this->hpBar.setFillColor(sf::Color::Red);
 
 
@@ -38,16 +37,28 @@ void Entity::initHpBars() {
 	this->deathText.setOutlineThickness(1.f);
 	this->deathText.setOutlineColor(sf::Color::Black);
 
-	this->deathText.setString("DEAD");*/
+	this->deathText.setString("DEAD");
+}
+
+void Entity::updateHpBar() {
+	this->hpRatio = static_cast<float>(this->attributeComponent->hp / this->attributeComponent->hpMax);
+	this->hpBar.setSize(sf::Vector2f(this->hpRatio * 32.f * 3.f, 10.f));
+	this->deathText.setPosition(
+		this->sprite.getPosition().x + this->sprite.getGlobalBounds().width / 2.f - this->deathText.getGlobalBounds().width / 2.f - 5.f,
+		this->sprite.getPosition().y - this->sprite.getGlobalBounds().height / 4.f);
+	this->hpBarMax.setPosition(sf::Vector2f(this->sprite.getPosition().x + 10.f, this->sprite.getPosition().y));
+	this->hpBar.setPosition(sf::Vector2f(this->sprite.getPosition().x + 10.f, this->sprite.getPosition().y));
+}
+
+void Entity::deathAnimation(const float& dt) {
+	this->animationComponent->play("DEATH", dt, true);
 }
 
 
 void Entity::initVariables() {
-	this->movementComponent = nullptr;
 	this->animationComponent = nullptr;
-	this->hitboxComponent = nullptr;
 	this->attributeComponent = nullptr;
-
+	this->attacking = false;
 }
 
 //Component Functions
@@ -58,65 +69,44 @@ void Entity::setTexture(sf::Texture& texture){
 	this->sprite.setTexture(texture);
 }
 
-void Entity::createHitboxComponent(sf::Sprite& sprite, const float offset_x, const float offset_y, const float width, const float height){
-	this->hitboxComponent = new HitboxComponent(sprite, offset_x, offset_y, width, height);
-}
-
-void Entity::createMovementComponent(const float maxVelocity, const float acceleration, const float deceleration){
-	this->movementComponent = new MovementComponent(this->sprite, maxVelocity, acceleration, deceleration);
-}
-
 void Entity::createAnimationComponent(sf::Texture& texture_sheet){
 	this->animationComponent = new AnimationComponent(this->sprite, texture_sheet);
 }
 
-void Entity::createAttributeComponent() {
-	//this->attributeComponent = new AttributeComponent();
+void Entity::createAttributeComponent(const unsigned level) {
+	this->attributeComponent = new AttributeComponent(level);
 }
 
 
 //Functions
-void Entity::move(const float dir_x, const float dir_y, const float& dt){
-	if (this->movementComponent) {
-		this->movementComponent->move(dir_x, dir_y, dt); // Sets velocity
-	}
-}
-
 void Entity::setPosition(const float x, const float y){
-
-		this->sprite.setPosition(x, y);
+	this->sprite.setPosition(x, y);
 }
 
-
-double Entity::getHp()
-{
-	 return this->currentHp;
-}
 
 std::stringstream Entity::getStatistics() {
 	std::stringstream ss;
-	ss << "\tName: " << this->name <<
-		"\n\t\tHp: " << this->currentHp << "/" << this->maxHp <<
-		"\n\t\tStrength: " << this->strength <<
-		"\n\t\tEndurance: " << this->endurance <<
-		"\n\t\tAgility: " << this->agility <<
-		"\n\t\tLevel: " << this->level <<
-		"\n\t\texp: " << this->exp << "/" << this->levelExp;
+	ss << "\tName: " << this->attributeComponent->name <<
+		"\n\t\tHp: " << this->attributeComponent->hp << "/" << this->attributeComponent->hpMax <<
+		"\n\t\tStrength: " << this->attributeComponent->strength <<
+		"\n\t\tVitality: " << this->attributeComponent->vitality <<
+		"\n\t\tAgility: " << this->attributeComponent->agility <<
+		"\n\t\tLevel: " << this->attributeComponent->level;
+	if (this->attributeComponent->attributePoints)
+		ss << " (+)";
+	ss << "\n\t\texp: " << this->attributeComponent->exp << "/" << this->attributeComponent->levelExp;
 	return ss;
 }
 
-double Entity::doDamage() {
-	return 20.f;
+int Entity::doDamage() {
+	return 20;
 }
 
-void Entity::getDamage(double damage) {
-	this->currentHp -= damage;
+void Entity::getDamage(int damage) {
+	this->attributeComponent->hp-= damage;
 }
 
 void Entity::update(const float& dt) {
-
-	if (this->movementComponent)
-		this->movementComponent->update(dt);
 
 }
 
@@ -129,8 +119,8 @@ void Entity::render(sf::RenderTarget& target){
 		target.draw(this->hpBar);
 	if(this->hpRatio <= 0)
 		target.draw(this->deathText);
+}
 
-	if (this->hitboxComponent)
-		this->hitboxComponent->render(target);
-
+double Entity::getHp() {
+	return this->attributeComponent->hp;
 }

@@ -1,17 +1,18 @@
 #pragma once
-#include "GameState.h"
+#include "State.h"
 #include "gui.h"
-#include "EditorState.h"
-#include "SettingsState.h"
-class MainMenuState : public State {
-	
+
+class CharacterScreenState : public State {
+
 private:
 	//Variables
-	sf::Music bgMusic;
+
+	sf::Sound snoreSound;
+	sf::SoundBuffer buffer;
 	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
 	sf::Font font;
-
+	Player* player;
 	std::map<std::string, gui::Button*> buttons;
 
 	//Functions
@@ -20,13 +21,13 @@ private:
 	void initFonts();
 	void initKeybinds();
 	void initButtons();
-	void initMusic();
 
 public:
-	MainMenuState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
-	virtual ~MainMenuState();
+	CharacterScreenState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, Player* player);
+	virtual ~CharacterScreenState();
 
 	//Functions
+
 	void updateInput(const float& dt);
 	void updateButtons();
 	void update(const float& dt);

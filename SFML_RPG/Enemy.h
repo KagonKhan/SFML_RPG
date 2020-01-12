@@ -5,13 +5,13 @@ class Enemy : public Entity {
 private:
 
 	//Variables
-	bool attacking, wasKilled;
+	bool wasKilled;
 
 	//Initializer functions
 	void initVariables();
-	void initComponents();
+	void initComponents(sf::Texture& texture_sheet);
+	void initAnimations();
 
-	void initHpBars();
 
 public:
 	//constructors
@@ -23,11 +23,9 @@ public:
 	bool getWasKilled() { return this->wasKilled; };
 	void setWasKilled(bool killed) { this->wasKilled = killed; };
 
+
 	virtual void update(const float& dt);
-	virtual void updateAttack(const float& dt);
 	virtual void updateAnimation(const float& dt);
-	void updateHpBar();
-	void deathAnimation(const float& dt);
 	bool isAnimationDone(std::string key) { return this->animationComponent->isDone(key); };
 };
 

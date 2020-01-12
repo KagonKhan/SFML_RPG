@@ -161,17 +161,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AttributeComponent.cpp" />
+    <ClCompile Include="CharacterScreenState.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameOverState.cpp" />
     <ClCompile Include="Gui.cpp" />
-    <ClCompile Include="EditorState.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameState.cpp" />
-    <ClCompile Include="HitboxComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
-    <ClCompile Include="MovementComponent.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
@@ -181,28 +179,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TownState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="AttributeComponent.h" />
+    <ClInclude Include="CharacterScreenState.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameOverState.h" />
     <ClInclude Include="Gui.h" />
-    <ClInclude Include="EditorState.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameState.h" />
-    <ClInclude Include="HitboxComponent.h" />
     <ClInclude Include="MainMenuState.h" />
-    <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SettingsState.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Tile.h" />
     <ClInclude Include="TownState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

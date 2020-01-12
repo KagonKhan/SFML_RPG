@@ -23,8 +23,8 @@ void GameOverState::initVariables() {
 }
 
 void GameOverState::initFonts() {
-	if (this->font.loadFromFile("Fonts/Dosis-Light.otf"))
-		;// throw("ERROR::GAMEOVERSTATE::COULD NOT LOAD FONT");
+	if (!this->font.loadFromFile("Fonts/Dosis-Light.otf"))
+		throw("ERROR::GAMEOVERSTATE::COULD NOT LOAD FONT");
 }
 
 void GameOverState::initKeybinds() {}
@@ -49,8 +49,6 @@ void GameOverState::initButtons() {
 }
 
 void GameOverState::updateButtons() {
-
-	/*Updates buttons in the state and handles functionality*/
 
 	for (auto it : this->buttons)
 		it.second->update(this->mousePosView);

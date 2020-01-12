@@ -3,6 +3,7 @@
 #include "TownState.h"
 #include "PauseMenu.h"
 #include "GameOverState.h"
+#include "CharacterScreenState.h"
 
 class GameState : public State {
 private:
@@ -30,6 +31,10 @@ private:
 	void initBackground();
 	void initButtons();
 	void initStatBox();
+
+
+
+
 	void attack();
 
 public:
