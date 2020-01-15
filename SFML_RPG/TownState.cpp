@@ -81,9 +81,8 @@ TownState::TownState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 
 TownState::~TownState() {
 	auto it = this->buttons.begin();
-	for (it; it != buttons.end(); ++it) {
+	for (it; it != buttons.end(); ++it)
 		delete it->second;
-	}
 }
 
 void TownState::updateInput(const float& dt) {
@@ -93,17 +92,12 @@ void TownState::updateInput(const float& dt) {
 void TownState::update(const float& dt) {
 	this->updateMousePositions();
 	this->updateInput(dt);
-
 	this->updateButtons();
-
-
-
 }
 
 void TownState::renderButtons(sf::RenderTarget& target) {
 	for (auto it : this->buttons)
 		it.second->render(target);
-
 }
 
 void TownState::render(sf::RenderTarget* target) {

@@ -7,12 +7,21 @@ class CharacterScreenState : public State {
 private:
 	//Variables
 
-	sf::Sound snoreSound;
-	sf::SoundBuffer buffer;
+	sf::Text nameText, statText;
+	sf::Font font;
+
 	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
-	sf::Font font;
+	sf::Texture frameTexture;
+	sf::RectangleShape frameBackground;
+
+
+
 	Player* player;
+
+	sf::Sound sound;
+	sf::SoundBuffer buffer;
+
 	std::map<std::string, gui::Button*> buttons;
 
 	//Functions
@@ -21,6 +30,9 @@ private:
 	void initFonts();
 	void initKeybinds();
 	void initButtons();
+	void initMusic();
+	void initPlayerFramePosition();
+	void initText();
 
 public:
 	CharacterScreenState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states, Player* player);

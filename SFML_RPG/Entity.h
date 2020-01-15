@@ -15,7 +15,6 @@ protected:
 	bool attacking;
 	sf::Sprite sprite;
 	AnimationComponent* animationComponent;
-	AttributeComponent* attributeComponent;
 
 	sf::Font font;
 	sf::Text deathText;
@@ -29,6 +28,7 @@ protected:
 
 public:
 
+	AttributeComponent* attributeComponent;
 	virtual void deathAnimation(const float& dt);
 
 	Entity();
@@ -39,7 +39,7 @@ public:
 	void createAttributeComponent(const unsigned level);
 	void setTexture(sf::Texture& texture);
 
-
+	virtual std::string getName() { return this->attributeComponent->name; };
 
 	//Functions
 	virtual int doDamage();
@@ -52,6 +52,7 @@ public:
 	double getHp();
 
 	std::stringstream getStatistics();
+	std::stringstream getFullStatistics();
 };
 
 

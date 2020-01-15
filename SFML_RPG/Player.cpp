@@ -43,6 +43,8 @@ void Player::updateAnimation(const float& dt) {
 }
 
 
+
+
 void Player::addExp(unsigned amount) {
 	this->attributeComponent->gainExp(amount);
 }
@@ -52,7 +54,7 @@ void Player::update(const float& dt){
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
 		this->attributeComponent->gainExp(20);
-	std::cout <<this->attributeComponent->debugPrint();
+	
 
 
 	this->updateHpBar();

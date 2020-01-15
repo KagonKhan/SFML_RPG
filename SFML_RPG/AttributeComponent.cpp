@@ -32,8 +32,8 @@ void AttributeComponent::updateStats(const bool reset) {
 	if(reset)
 		this->hp = this->hpMax;
 
-	this->damageMax	= this->strength	 * 5;
-	this->damageMin	= this->strength	 * 2;
+	this->damageMax	= this->strength	 * 5 + 20;
+	this->damageMin	= this->strength	 * 2 + 10;
 	this->accuracy	= this->dexterity	 * 3;
 	this->defence	= this->agility		 * 3;
 	this->luck		= this->intelligence * 2;

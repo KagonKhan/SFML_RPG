@@ -10,7 +10,7 @@ gui::Button::Button(float x, float y, float width, float height,
 				sf::Color idle_color, sf::Color hover_color, sf::Color active_color,
 				sf::Color outline_idle_color, sf::Color outline_hover_color, sf::Color outline_active_color,
 				short unsigned id){
-
+	this->type = 0;
 	this->buttonState = BTN_IDLE;
 
 	this->shape.setPosition(sf::Vector2f(x, y));
@@ -25,9 +25,14 @@ gui::Button::Button(float x, float y, float width, float height,
 	this->text.setFillColor(text_idle_color);
 	this->text.setCharacterSize(character_size);
 
-	this->text.setPosition(
-				this->shape.getPosition().x + (this->shape.getGlobalBounds().width / 2.f) - this->text.getGlobalBounds().width / 2.f, 
-				this->shape.getPosition().y + (this->shape.getGlobalBounds().height / 2.f) - this->text.getGlobalBounds().height / 2.f);
+	float pos_x, pos_y;
+		pos_x = this->shape.getPosition().x + (this->shape.getGlobalBounds().width / 2.f) - this->text.getGlobalBounds().width / 2.f;
+		pos_y = this->shape.getPosition().y + (this->shape.getGlobalBounds().height / 2.f) - this->text.getGlobalBounds().height / 2.f;
+
+	if(text == "+")
+		pos_y = this->shape.getPosition().y - this->text.getGlobalBounds().height / 2.f;
+
+	this->text.setPosition(pos_x, pos_y);
 
 	this->textIdleColor = text_idle_color;
 	this->textHoverColor = text_hover_color;
@@ -46,14 +51,50 @@ gui::Button::Button(float x, float y, float width, float height,
 	this->id = id;
 }
 
+
+
+gui::Button::Button(float x, float y, float width, float height,
+				std::string bgSource,
+				sf::Color text_idle_color, sf::Color text_hover_color, sf::Color text_active_color,
+				sf::Color idle_color, sf::Color hover_color, sf::Color active_color,
+				sf::Color outline_idle_color, sf::Color outline_hover_color, sf::Color outline_active_color,
+				short unsigned id){
+	this->font = nullptr;
+	this->type = 0;
+	this->buttonState = BTN_IDLE;
+
+	this->shape.setPosition(sf::Vector2f(x, y));
+	this->shape.setSize(sf::Vector2f(width, height));
+	this->shape.setOutlineThickness(1.f);
+	this->shape.setOutlineColor(outline_idle_color);
+
+
+	this->idleColor = idle_color;
+	this->hoverColor = hover_color;
+	this->activeColor = active_color;
+
+	this->outlineIdleColor   = outline_idle_color;
+	this->outlineHoverColor  = outline_hover_color;
+	this->outlineActiveColor = outline_active_color;
+
+	
+	this->texture.loadFromFile(bgSource);
+
+	this->id = id;
+
+	this->shape.setTexture(&texture);
+	this->type = 200;
+}
+
+
+
+
 gui::Button::~Button(){
 
 }
 
 
 //ACCESSORS
-
-
 
 
 const std::string gui::Button::getText() const
@@ -77,14 +118,13 @@ void gui::Button::setId(const short unsigned id) {
 }
 
 const bool gui::Button::isPressed() {
-	if (this->buttonState == BTN_ACTIVE) {
-		//Sleep(100); //Totally ghetto solution lmao
+	if (this->buttonState == BTN_ACTIVE) 
 		return true;
-	}
+	
 	return false;
 }
 //FUNCTIONS
-void gui::Button::update(const sf::Vector2f& mousePos){
+void gui::Button::update(const sf::Vector2f& mousePos) {
 	//IDLE
 	this->buttonState = BTN_IDLE;
 	//HOVER
@@ -97,32 +137,32 @@ void gui::Button::update(const sf::Vector2f& mousePos){
 		}
 	}
 	//COLORING
-	switch (this->buttonState) {
-	case BTN_IDLE:
-		this->shape.setFillColor(this->idleColor);
-		this->text.setFillColor(this->textIdleColor);
-		this->text.setOutlineColor(this->outlineIdleColor);
-		break;
-	case BTN_HOVER:
-		this->shape.setFillColor(this->hoverColor);
-		this->text.setFillColor(this->textHoverColor);
-		this->text.setOutlineColor(this->outlineHoverColor);
-		break;
-	case BTN_ACTIVE:
-		this->shape.setFillColor(this->activeColor);
-		this->text.setFillColor(this->textActiveColor);
-		this->text.setOutlineColor(this->outlineActiveColor);
-		break;
+	if (this->type == 0)
+		switch (this->buttonState) {
+		case BTN_IDLE:
+			this->shape.setFillColor(this->idleColor);
+			this->text.setFillColor(this->textIdleColor);
+			this->text.setOutlineColor(this->outlineIdleColor);
+			break;
+		case BTN_HOVER:
+			this->shape.setFillColor(this->hoverColor);
+			this->text.setFillColor(this->textHoverColor);
+			this->text.setOutlineColor(this->outlineHoverColor);
+			break;
+		case BTN_ACTIVE:
+			this->shape.setFillColor(this->activeColor);
+			this->text.setFillColor(this->textActiveColor);
+			this->text.setOutlineColor(this->outlineActiveColor);
+			break;
 
 
-	default:
-		this->shape.setFillColor(sf::Color::Red);
-		this->text.setFillColor(sf::Color::Blue);
-		this->text.setOutlineColor(sf::Color::Green);
-		break;
+		default:
+			this->shape.setFillColor(sf::Color::Red);
+			this->text.setFillColor(sf::Color::Blue);
+			this->text.setOutlineColor(sf::Color::Green);
+			break;
 
-	}
-
+		}
 }
 
 void gui::Button::render(sf::RenderTarget& target){

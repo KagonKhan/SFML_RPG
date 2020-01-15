@@ -21,7 +21,6 @@ public:
 	virtual void updateAnimation(const float& dt);
 
 
-
 	void fullHeal();
 
 	bool isAnimationDone(std::string key) { return this->animationComponent->isDone(key); };

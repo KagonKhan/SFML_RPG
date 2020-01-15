@@ -5,20 +5,30 @@
 #include "GameOverState.h"
 #include "CharacterScreenState.h"
 
+enum whichEntity{PLAYER = 0, ENEMY};
+
 class GameState : public State {
 private:
 
+
+	bool playerRound;
 
 	Player* player;
 	Enemy* enemy;
 	PauseMenu* pMenu;
 	sf::Font font;
-
+	sf::Sound sound;
+	sf::SoundBuffer buffer;
 	std::map<std::string, gui::Button*> buttons;
+	
+	//maybe a map, not sure if will be usefull so far
+	sf::Texture bgTextures[4];
+	sf::Texture test;
+
 
 	sf::RectangleShape background;
 	sf::RectangleShape statBox;
-	sf::Texture backgroundTexture;
+
 	sf::Text statText;
 
 	//Functions
@@ -31,11 +41,15 @@ private:
 	void initBackground();
 	void initButtons();
 	void initStatBox();
+	void initMusic();
 
 
 
 
-	void attack();
+	void attack(bool type);
+	void enemyAttack(bool type);
+
+	float timeCounter;
 
 public:
 	GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);

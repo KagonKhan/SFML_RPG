@@ -7,6 +7,7 @@ Game::Game(){
 	/*Initialize the game window as game object is created*/
 	this->initWindow();
 	this->initKeys();
+	srand(time(NULL));
 	this->initStates(); 
 }
 
@@ -87,9 +88,7 @@ void Game::initKeys() {
 
 	ifs.close();
 
-	//DEBUG REMOVE LATER
-	for (auto i : this->supportedKeys)
-		std::cout << i.first << " " << i.second << "\n";
+
 }
 
 void Game::initStates(){
@@ -101,7 +100,7 @@ void Game::updateDt(){
 	/*Updates the dt variable with time it takes to update and render - frame time*/
 	this->dt = this->dtClock.restart().asSeconds();
 	system("cls");
-	std::cout << 1/this->dt << "\n";
+//	std::cout << 1/this->dt << "\n";
 }
 
 void Game::updateSFMLEvents(){

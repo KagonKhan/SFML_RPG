@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "GameState.h"
 #include "Windows.h"
+
+#pragma region Initializer functions
+
+
 //Initializer functions
 void GameState::initKeybinds(){
 	std::ifstream ifs("Config/gamestate_keybinds.ini");
@@ -39,20 +43,15 @@ void GameState::initBackground() {
 		)
 	);
 
-	if (!this->backgroundTexture.loadFromFile("Resources/images/background/bgArena.png")) {
-		throw"ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
-	}
-
-	this->background.setTexture(&backgroundTexture);
-
+	for (int i = 1; i <= 4; i++) 
+		this->bgTextures[i-1].loadFromFile("Resources/images/background/bgArena" + std::to_string(i) +".png");
+	this->background.setTexture(&bgTextures[0]);
 }
-
 
 void GameState::initEnemy(){
 	this->enemy = new Enemy(1050.f, 800.f, this->textures["IDLE"]);
 }
 
-/*Sus*/
 void GameState::initStatBox(){
 	this->statBox.setSize(sf::Vector2f(300.f, 280.f));
 	this->statBox.setPosition(sf::Vector2f(1.f, 1.f));
@@ -71,66 +70,13 @@ void GameState::initStatBox(){
 
 }
 
-void GameState::updateStat(const float& dt) {
+void GameState::initMusic() {
 
-
-	this->statText.setString(this->player->getStatistics().str());
-	if (this->player->getHp() <= 0.f) 
-		this->player->deathAnimation(dt);
-
-	if (this->enemy && this->enemy->getHp() <= 0) {
-		this->enemy->deathAnimation(dt);
-		this->enemy->setWasKilled(true);
-	}
-
-
-
-	if (this->enemy && this->enemy->isAnimationDone("DEATH")) {
-		if (this->enemy->getWasKilled()) {
-			this->player->addExp(1000);
-			this->enemy->setWasKilled(false);
-		}
-		delete this->enemy;
-		this->enemy = nullptr;
-	}
-
-	if (this->player->isAnimationDone("DEATH")) {
-
-		Sleep(1000);
-		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
-	}
+	this->buffer.loadFromFile("Music/soundPageFlip.ogg");
+	this->sound.setBuffer(buffer);
+	this->sound.setVolume(1.f);
 }
 
-//Constructors
-GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
-	:State(window, supportedKeys, states){
-	this->initBackground();
-	this->initKeybinds();
-	this->initFonts();
-	this->initTextures();
-	this->initPlayers();
-	this->initPauseMenu();
-	this->initButtons();
-	this->initStatBox();
-
-
-	
-}
-
-
-GameState::~GameState(){
-	delete this->player;
-	delete this->pMenu;
-	delete this->enemy;
-
-	auto it = this->buttons.begin();
-	for (it; it != buttons.end(); ++it) {
-		delete it->second;
-	}
-}
-
-
-//BUTTONS
 void GameState::initButtons() {
 
 	this->buttons["ATTACK1"] = new gui::Button(
@@ -173,6 +119,67 @@ void GameState::initButtons() {
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
 	);
 
+	this->buttons["NEXT_AREA"] = new gui::Button(
+		1750.f, 10.f, 100.f, 100.f,
+		 "Resources/images/background/rightArrow.png",
+		sf::Color(255, 255, 255, 0), sf::Color(120, 120, 120, 0), sf::Color(20, 20, 20, 0),
+		sf::Color(0, 0, 0, 100), sf::Color(0, 0, 0, 100), sf::Color(0, 0, 0, 100),
+		sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0)
+	);
+
+}
+
+#pragma endregion
+
+#pragma region constructors
+
+
+//Constructors
+GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
+	:State(window, supportedKeys, states){
+	this->initBackground();
+	this->initKeybinds();
+	this->initFonts();
+	this->initTextures();
+	this->initPlayers();
+	this->initPauseMenu();
+	this->initButtons();
+	this->initStatBox();
+	this->initMusic();
+
+	this->playerRound = true;
+	this->timeCounter = 0.f;
+	
+}
+
+
+GameState::~GameState(){
+	delete this->player;
+	delete this->pMenu;
+	delete this->enemy;
+
+	auto it = this->buttons.begin();
+	for (it; it != buttons.end(); ++it) {
+		delete it->second;
+	}
+
+	this->sound.~Sound();
+}
+
+#pragma endregion
+
+#pragma region Update functions
+
+//Pause / Unpause the game
+void GameState::updateInput(const float& dt){
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime()) {
+
+		if (!this->paused)
+			this->pauseState();
+		else
+			this->unpauseState();
+	}
 }
 
 void GameState::updateButtons(const float& dt) {
@@ -183,8 +190,7 @@ void GameState::updateButtons(const float& dt) {
 			it.second->update(this->mousePosView);
 		//Attack
 		if (this->buttons["ATTACK1"]->isPressed() && this->getKeytime())
-			attack();
-
+			attack(PLAYER);
 
 		//Spawn enemy
 		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
@@ -193,35 +199,22 @@ void GameState::updateButtons(const float& dt) {
 		if (this->buttons["DIE"]->isPressed() && this->getKeytime())
 			this->player->getDamage(9999999);
 
-		if (this->buttons["CHARACTER_STATE"]->isPressed() && this->getKeytime())
+		if (this->buttons["CHARACTER_STATE"]->isPressed() && this->getKeytime()) {
+			this->sound.play();
 			this->states->push(new CharacterScreenState(this->window, this->supportedKeys, this->states, this->player));
-
+		}
 
 		//Town state
 		if (this->buttons["TOWN"]->isPressed() && this->getKeytime()) {
 			this->enemy = nullptr;
 			this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
 		}
+		if (this->buttons["NEXT_AREA"]->isPressed() && this->getKeytime()) {
+
+			int i = rand() % 4 ; // change later to static loading, as this is too slow, also its not true fhd no clue why rn
+			this->background.setTexture(&this->bgTextures[i]);
+		}
 	
-}
-
-void GameState::renderButtons(sf::RenderTarget& target) {
-	for (auto it : this->buttons)
-		it.second->render(target);
-
-}
-
-//Functions
-
-//Pause / Unpause the game
-void GameState::updateInput(const float& dt){
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime()) {
-
-		if (!this->paused)
-			this->pauseState();
-		else
-			this->unpauseState();
-	}
 }
 
 //Player movement
@@ -235,6 +228,37 @@ void GameState::updatePlayerInput(const float& dt){
 void GameState::updatePauseMenuButtons(){
 	if (this->pMenu->isButtonPressed("QUIT"))
 		this->endState();
+}
+
+void GameState::updateStat(const float& dt) {
+
+	this->statText.setString(this->player->getStatistics().str());
+	if (this->player->getHp() <= 0.f) 
+		this->player->deathAnimation(dt);
+	   
+	if (this->enemy && this->enemy->getHp() <= 0) {
+		this->enemy->deathAnimation(dt);
+		this->enemy->setWasKilled(true);
+		this->playerRound = true;
+	}
+
+	if (this->enemy && this->enemy->isAnimationDone("DEATH")) {
+		if (this->enemy->getWasKilled()) {
+			this->player->addExp(1000);
+			this->enemy->setWasKilled(false);
+		}
+		
+		delete this->enemy;
+		this->enemy = nullptr;
+	}
+
+	if (this->player->isAnimationDone("DEATH")) {
+		Sleep(1000);
+		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
+	}
+
+
+
 }
 
 void GameState::update(const float& dt){
@@ -259,9 +283,21 @@ void GameState::update(const float& dt){
 		this->updatePauseMenuButtons();
 	}
 
+
+	this->timeCounter += dt;
+	if (this->enemy && this->timeCounter > 1.5f && !this->playerRound)
+		this->enemyAttack(ENEMY);
+
 }
 
+
+#pragma endregion
+
+#pragma region Render functions
+
 void GameState::render(sf::RenderTarget* target){
+
+
 	if (!target)
 		target = this->window;
 	target->draw(this->background);
@@ -283,10 +319,41 @@ void GameState::render(sf::RenderTarget* target){
 	}
 }
 
-void GameState::attack() {
+void GameState::renderButtons(sf::RenderTarget& target) {
+	if(this->playerRound)
+		for (auto it : this->buttons)
+			it.second->render(target);
 
-	this->player->setIsAttacking();
+}
 
-	if(this->enemy)
-		this->enemy->getDamage(this->player->doDamage());
+#pragma endregion
+
+
+
+
+
+void GameState::attack(bool type) {
+	if (playerRound) {
+		this->player->setIsAttacking();
+
+		if (this->enemy) {
+			if (!type) // player=0 attacking else enemy attacking
+				this->enemy->getDamage(this->player->doDamage());
+		}
+	}
+	this->playerRound = false;
+	this->timeCounter = 0.f;
+}
+
+void GameState::enemyAttack(bool type) {
+
+	this->enemy->setIsAttacking();
+
+	if (this->player) {
+		if (type) // player=0 attacking else enemy attacking
+			this->player->getDamage(this->enemy->doDamage());
+	}
+	
+	this->playerRound = true;
+	this->timeCounter = 0.f;
 }
