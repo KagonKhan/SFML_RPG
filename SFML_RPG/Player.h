@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Entity.h"
 
 class Player :	public Entity{
@@ -20,6 +21,9 @@ public:
 	virtual void update(const float& dt);
 	virtual void updateAnimation(const float& dt);
 
+
+	float getPosX() { return this->hpBarMax.getPosition().x; }
+	float getPosY() { return this->hpBarMax.getPosition().y; }
 
 	void fullHeal();
 

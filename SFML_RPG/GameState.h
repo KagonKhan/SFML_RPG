@@ -12,6 +12,9 @@ private:
 
 
 	bool playerRound;
+	bool showMissText;
+	int missTextColorR, missTextColorG, missTextColorB, missTextColorA;
+	float missXwavePos, missYwavePos;
 
 	Player* player;
 	Enemy* enemy;
@@ -24,6 +27,8 @@ private:
 	//maybe a map, not sure if will be usefull so far
 	sf::Texture bgTextures[4];
 	sf::Texture test;
+
+	sf::Text missText;
 
 
 	sf::RectangleShape background;
@@ -42,12 +47,15 @@ private:
 	void initButtons();
 	void initStatBox();
 	void initMusic();
+	void initText();
+	void initVariables();
 
 
 
 
-	void attack(bool type);
-	void enemyAttack(bool type);
+	void checkHit(bool type, const float& dt);
+	void attack(bool type, const float& dt);
+	void enemyAttack(bool type, const float& dt);
 
 	float timeCounter;
 
@@ -65,6 +73,11 @@ public:
 	void updatePlayerInput(const float& dt);
 	void updatePauseMenuButtons();
 	void update(const float& dt);
-	void updateStat(const float& dt);
+	void updateAnimations(const float& dt);
+	void updateText(const float& dt);
 	void render(sf::RenderTarget* target = nullptr);
+
+
+
+	void renderMissText(const float& dt);
 };

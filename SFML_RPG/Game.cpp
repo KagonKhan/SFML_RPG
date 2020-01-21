@@ -7,7 +7,7 @@ Game::Game(){
 	/*Initialize the game window as game object is created*/
 	this->initWindow();
 	this->initKeys();
-	srand(time(NULL));
+	srand((time)(NULL));
 	this->initStates(); 
 }
 

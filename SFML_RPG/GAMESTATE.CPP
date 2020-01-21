@@ -4,7 +4,6 @@
 
 #pragma region Initializer functions
 
-
 //Initializer functions
 void GameState::initKeybinds(){
 	std::ifstream ifs("Config/gamestate_keybinds.ini");
@@ -71,7 +70,6 @@ void GameState::initStatBox(){
 }
 
 void GameState::initMusic() {
-
 	this->buffer.loadFromFile("Music/soundPageFlip.ogg");
 	this->sound.setBuffer(buffer);
 	this->sound.setVolume(1.f);
@@ -129,10 +127,29 @@ void GameState::initButtons() {
 
 }
 
+void GameState::initText() {
+	this->missText.setFont(this->font);
+	this->missText.setCharacterSize(35);
+	this->missText.setFillColor(sf::Color::Red);
+	this->missText.setPosition(this->player->getPosX(), this->player->getPosY());
+	this->missText.setString("MISS");
+	this->missText.setOutlineThickness(3.f);
+	this->missText.setOutlineColor(sf::Color::Black);
+
+}
+
+void GameState::initVariables() {
+
+	this->playerRound = true;
+	this->timeCounter = 0.f;
+	this->showMissText = false;
+	this->missTextColorR = this->missTextColorG = this->missTextColorB = 0;
+	this->missTextColorA = 255;
+	this->missXwavePos = missYwavePos = 0.f;
+}
 #pragma endregion
 
 #pragma region constructors
-
 
 //Constructors
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
@@ -146,12 +163,9 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	this->initButtons();
 	this->initStatBox();
 	this->initMusic();
-
-	this->playerRound = true;
-	this->timeCounter = 0.f;
-	
+	this->initVariables();
+	this->initText();
 }
-
 
 GameState::~GameState(){
 	delete this->player;
@@ -182,47 +196,8 @@ void GameState::updateInput(const float& dt){
 	}
 }
 
-void GameState::updateButtons(const float& dt) {
-
-	/*Updates buttons in the state and handles functionality*/
-
-		for (auto it : this->buttons)
-			it.second->update(this->mousePosView);
-		//Attack
-		if (this->buttons["ATTACK1"]->isPressed() && this->getKeytime())
-			attack(PLAYER);
-
-		//Spawn enemy
-		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
-			this->initEnemy();
-
-		if (this->buttons["DIE"]->isPressed() && this->getKeytime())
-			this->player->getDamage(9999999);
-
-		if (this->buttons["CHARACTER_STATE"]->isPressed() && this->getKeytime()) {
-			this->sound.play();
-			this->states->push(new CharacterScreenState(this->window, this->supportedKeys, this->states, this->player));
-		}
-
-		//Town state
-		if (this->buttons["TOWN"]->isPressed() && this->getKeytime()) {
-			this->enemy = nullptr;
-			this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
-		}
-		if (this->buttons["NEXT_AREA"]->isPressed() && this->getKeytime()) {
-
-			int i = rand() % 4 ; // change later to static loading, as this is too slow, also its not true fhd no clue why rn
-			this->background.setTexture(&this->bgTextures[i]);
-		}
-	
-}
-
 //Player movement
-void GameState::updatePlayerInput(const float& dt){
-
-
-	
-}
+void GameState::updatePlayerInput(const float& dt){}
 
 //Pause Menu Buttons
 void GameState::updatePauseMenuButtons(){
@@ -230,9 +205,8 @@ void GameState::updatePauseMenuButtons(){
 		this->endState();
 }
 
-void GameState::updateStat(const float& dt) {
+void GameState::updateAnimations(const float& dt) {
 
-	this->statText.setString(this->player->getStatistics().str());
 	if (this->player->getHp() <= 0.f) 
 		this->player->deathAnimation(dt);
 	   
@@ -247,7 +221,6 @@ void GameState::updateStat(const float& dt) {
 			this->player->addExp(1000);
 			this->enemy->setWasKilled(false);
 		}
-		
 		delete this->enemy;
 		this->enemy = nullptr;
 	}
@@ -258,18 +231,53 @@ void GameState::updateStat(const float& dt) {
 	}
 
 
+	this->timeCounter += dt;
+	float timeLimit = static_cast<float>(rand() % 5 + 10) / 10.f;
+	if (this->enemy && this->timeCounter > timeLimit && !this->playerRound)
+		this->enemyAttack(ENEMY, dt);
+
+}
+
+void GameState::updateText(const float& dt) {
+	
+	this->statText.setString(this->player->getStatistics().str());
+
+	//Miss text updates;
+	if (showMissText) {
+
+		this->missTextColorR += 2;/*Probably remove later, for swag now*/
+		this->missTextColorG += 1;
+		this->missTextColorB += 0;
+		this->missText.setFillColor(sf::Color(
+			this->missTextColorR,
+			this->missTextColorB,
+			this->missTextColorG,
+			this->missTextColorA));
+		this->missTextColorR %= 255;
+		this->missTextColorG %= 255;
+		this->missTextColorB %= 255;/*========*/
+
+
+		this->missXwavePos += 2.f * dt;
+		this->missYwavePos += 8.f * dt;
+		this->missTextColorA -= dt;
+		this->missText.setPosition(sf::Vector2f(this->player->getPosX()+100.f + 10.f * cosf(missXwavePos), this->player->getPosY() - missYwavePos + 50.f));
+		if (missTextColorA <= 0.f)
+			this->showMissText = false;
+	}
 
 }
 
 void GameState::update(const float& dt){
 	this->updateInput(dt);
 	this->updateButtons(dt);
-	this->updateStat(dt);
+	this->updateAnimations(dt);
 	this->updateMousePositions();
-	
 	this->updateKeytime(dt);
+	this->updateText(dt);
 
-	if (!this->paused) { // Unpaused update
+	// Unpaused update
+	if (!this->paused) {
 
 		this->updatePlayerInput(dt);
 
@@ -277,17 +285,47 @@ void GameState::update(const float& dt){
 		if(this->enemy)
 			this->enemy->update(dt);
 	}
-	else {//paused
-		
+	//paused
+	else {
 		this->pMenu->update(this->mousePosView);
 		this->updatePauseMenuButtons();
 	}
 
+}
 
-	this->timeCounter += dt;
-	if (this->enemy && this->timeCounter > 1.5f && !this->playerRound)
-		this->enemyAttack(ENEMY);
+void GameState::updateButtons(const float& dt) {
 
+	if (this->playerRound) {
+		for (auto it : this->buttons)
+			it.second->update(this->mousePosView);
+		//Attack
+		if (this->buttons["ATTACK1"]->isPressed() && this->getKeytime())
+			checkHit(PLAYER, dt);
+
+		//Spawn enemy
+		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
+			this->initEnemy();
+
+		if (this->buttons["DIE"]->isPressed() && this->getKeytime())
+			this->player->getDamage(9999999);
+
+
+		if (this->buttons["CHARACTER_STATE"]->isPressed() && this->getKeytime()) {
+			this->sound.play();
+			this->states->push(new CharacterScreenState(this->window, this->supportedKeys, this->states, this->player));
+		}
+
+		//Town state
+		if (this->buttons["TOWN"]->isPressed() && this->getKeytime()) {
+			this->enemy = nullptr;
+			this->states->push(new TownState(this->window, this->supportedKeys, this->states, this->player));
+		}
+		if (this->buttons["NEXT_AREA"]->isPressed() && this->getKeytime()) {
+
+			int i = rand() % 4; // change later to static loading, as this is too slow, also its not true fhd no clue why rn
+			this->background.setTexture(&this->bgTextures[i]);
+		}
+	}
 }
 
 
@@ -297,33 +335,36 @@ void GameState::update(const float& dt){
 
 void GameState::render(sf::RenderTarget* target){
 
-
 	if (!target)
 		target = this->window;
 	target->draw(this->background);
 	this->player->render(*target);
 
 
-
 	if(this->enemy)
 		this->enemy->render(*target);
+
 
 	if (this->paused) { //Pause menu render
 		this->pMenu->render(*target);
 	}
+
 
 	if (!this->paused) {
 		this->renderButtons(*target);
 		target->draw(this->statBox);
 		target->draw(this->statText);
 	}
+
+
+	if(showMissText)
+		target->draw(this->missText);
 }
 
 void GameState::renderButtons(sf::RenderTarget& target) {
 	if(this->playerRound)
 		for (auto it : this->buttons)
 			it.second->render(target);
-
 }
 
 #pragma endregion
@@ -332,20 +373,28 @@ void GameState::renderButtons(sf::RenderTarget& target) {
 
 
 
-void GameState::attack(bool type) {
-	if (playerRound) {
-		this->player->setIsAttacking();
+void GameState::checkHit(bool type, const float& dt) {
 
-		if (this->enemy) {
-			if (!type) // player=0 attacking else enemy attacking
-				this->enemy->getDamage(this->player->doDamage());
-		}
-	}
-	this->playerRound = false;
-	this->timeCounter = 0.f;
+	if (this->enemy && this->playerRound)
+		this->attack(type, dt);
+	else
+		this->renderMissText(dt);
+
 }
 
-void GameState::enemyAttack(bool type) {
+void GameState::attack(bool type, const float& dt) {
+
+	this->player->setIsAttacking();
+
+	this->enemy->getDamage(this->player->doDamage());
+	this->enemy->setIsHurting();
+	
+	this->playerRound = false;
+	this->timeCounter = 0.f;
+
+}
+
+void GameState::enemyAttack(bool type, const float& dt) {
 
 	this->enemy->setIsAttacking();
 
@@ -356,4 +405,15 @@ void GameState::enemyAttack(bool type) {
 	
 	this->playerRound = true;
 	this->timeCounter = 0.f;
+
+	this->player->setIsHurting();
+
+}
+
+
+void GameState::renderMissText(const float& dt) {
+	this->showMissText = true;
+	this->missTextColorA = 255;
+	this->missXwavePos = 0.f;
+	this->missYwavePos = 0.f;
 }

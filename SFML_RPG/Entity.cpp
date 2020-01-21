@@ -12,7 +12,6 @@ Entity::Entity(){
 	this->initHpBars();
 }
 
-
 Entity::~Entity(){
 	delete this->animationComponent;
 	delete this->attributeComponent;
@@ -54,11 +53,12 @@ void Entity::deathAnimation(const float& dt) {
 	this->animationComponent->play("DEATH", dt, true);
 }
 
-
 void Entity::initVariables() {
 	this->animationComponent = nullptr;
 	this->attributeComponent = nullptr;
-	this->attacking = false;
+	this->attacking = 0;
+	this->hurting = false;
+	this->timeCounter = 0.f;
 }
 
 //Component Functions
@@ -141,13 +141,10 @@ void Entity::getDamage(int damage) {
 	this->attributeComponent->hp -= static_cast<int>(damageDealt);
 }
 
-void Entity::update(const float& dt) {
-
-}
+void Entity::update(const float& dt) {}
 
 void Entity::render(sf::RenderTarget& target){
 	target.draw(this->sprite);
-	//target.draw(this->missText);
 	
 	target.draw(this->hpBarMax);
 	if(this->hpRatio >=0)

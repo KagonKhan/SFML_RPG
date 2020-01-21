@@ -10,9 +10,8 @@ private:
 
 
 protected:
-
 	virtual void updateHpBar();
-	bool attacking;
+	bool attacking, hurting;
 	sf::Sprite sprite;
 	AnimationComponent* animationComponent;
 
@@ -45,11 +44,19 @@ public:
 	virtual int doDamage();
 	void getDamage(int damage);
 	void setIsAttacking() { this->attacking = true; };
+	void setIsHurting() { this->hurting = true; };
 	bool getIsAttacking() { return this->attacking; };
+	double getHp();
+
 	virtual void setPosition(const float x, const float y);
 	virtual void update(const float& dt);
 	virtual void render(sf::RenderTarget& target);
-	double getHp();
+
+
+	
+
+
+	float timeCounter;
 
 	std::stringstream getStatistics();
 	std::stringstream getFullStatistics();
