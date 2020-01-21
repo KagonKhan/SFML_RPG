@@ -28,7 +28,7 @@ protected:
 public:
 
 	AttributeComponent* attributeComponent;
-	virtual void deathAnimation(const float& dt);
+	virtual bool deathAnimation(const float& dt);
 
 	Entity();
 	virtual ~Entity();
@@ -43,7 +43,7 @@ public:
 	//Functions
 	virtual int doDamage();
 	void getDamage(int damage);
-	void setIsAttacking() { this->attacking = true; };
+	virtual void setIsAttacking() { this->attacking = true; };
 	void setIsHurting() { this->hurting = true; };
 	bool getIsAttacking() { return this->attacking; };
 	double getHp();

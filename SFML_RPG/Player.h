@@ -7,7 +7,7 @@ private:
 
 	//Variables
 
-
+	int attackType;
 	//Initializer functions
 	void initComponents(sf::Texture& texture_sheet);
 	void initAnimations();
@@ -20,7 +20,7 @@ public:
 	//Functions
 	virtual void update(const float& dt);
 	virtual void updateAnimation(const float& dt);
-
+	virtual void setIsAttacking(int attackType);
 
 	float getPosX() { return this->hpBarMax.getPosition().x; }
 	float getPosY() { return this->hpBarMax.getPosition().y; }

@@ -53,8 +53,8 @@ private:
 
 
 
-	void checkHit(bool type, const float& dt);
-	void attack(bool type, const float& dt);
+	void checkHit(bool type, int attackType, const float& dt);
+	void attack(bool type, int attackType, const float& dt);
 	void enemyAttack(bool type, const float& dt);
 
 	float timeCounter;

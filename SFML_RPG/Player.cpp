@@ -22,6 +22,7 @@ Player::Player(float x, float y, sf::Texture& texture_sheet){
 	this->initAnimations();
 	this->setPosition(x, y);
 	this->attributeComponent->name = "Kagon";
+	this->attackType = 0;
 }
 
 
@@ -33,11 +34,29 @@ void Player::fullHeal() {
 	this->attributeComponent->hp = this->attributeComponent->hpMax;
 }
 
+void Player::setIsAttacking(int attackType) { 
+	this->attacking = true;
+	this->attackType = attackType;
+
+};
+
 void Player::updateAnimation(const float& dt) {
 
-	if (this->attacking)
-		if (this->animationComponent->play("ATTACK2", dt, true))
-			this->attacking = false;
+	if (this->attacking )
+		switch (this->attackType) {
+		case 1:
+			if(this->animationComponent->play("ATTACK1", dt, true))
+				this->attacking = false;
+			break;
+		case 2:
+			if(this->animationComponent->play("ATTACK2", dt, true))
+				this->attacking = false;
+			break;
+		case 3:
+			if(this->animationComponent->play("ATTACK3", dt, true))
+				this->attacking = false;
+			break;
+		}
 
 	if (this->hurting) {
 		this->timeCounter += dt;

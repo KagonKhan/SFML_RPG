@@ -79,7 +79,21 @@ void GameState::initButtons() {
 
 	this->buttons["ATTACK1"] = new gui::Button(
 		350.f, 10.f, 200.f, 50.f,
-		&this->font, "Attack", 25,
+		&this->font, "Low Attack", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+	this->buttons["ATTACK2"] = new gui::Button(
+		350.f, 70.f, 200.f, 50.f,
+		&this->font, "High Attack", 25,
+		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
+		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
+		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
+	);
+	this->buttons["ATTACK3"] = new gui::Button(
+		350.f, 140.f, 200.f, 50.f,
+		&this->font, "Medium Attack", 25,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
@@ -92,18 +106,18 @@ void GameState::initButtons() {
 		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
 	);
-
-	this->buttons["TOWN"] = new gui::Button(
-		850.f, 10.f, 180.f, 50.f,
-		&this->font, "Town", 25,
+	
+	this->buttons["DIE"] = new gui::Button(
+		1100.f, 10.f, 200.f, 50.f,
+		&this->font, "Suicide", 25,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
 	);
 
-	this->buttons["DIE"] = new gui::Button(
-		1100.f, 10.f, 180.f, 50.f,
-		&this->font, "Die", 25,
+	this->buttons["TOWN"] = new gui::Button(
+		850.f, 10.f, 180.f, 50.f,
+		&this->font, "Town", 25,
 		sf::Color(255, 255, 255, 200), sf::Color(120, 120, 120, 250), sf::Color(20, 20, 20, 50),
 		sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255),
 		sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255), sf::Color(255, 255, 255, 255)
@@ -208,7 +222,8 @@ void GameState::updatePauseMenuButtons(){
 void GameState::updateAnimations(const float& dt) {
 
 	if (this->player->getHp() <= 0.f) 
-		this->player->deathAnimation(dt);
+		if(this->player->deathAnimation(dt))
+			this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
 	   
 	if (this->enemy && this->enemy->getHp() <= 0) {
 		this->enemy->deathAnimation(dt);
@@ -225,10 +240,10 @@ void GameState::updateAnimations(const float& dt) {
 		this->enemy = nullptr;
 	}
 
-	if (this->player->isAnimationDone("DEATH")) {
+	/*if (this->player->isAnimationDone("DEATH")) {
 		Sleep(1000);
 		this->states->push(new GameOverState(this->window, this->supportedKeys, this->states));
-	}
+	}*/
 
 
 	this->timeCounter += dt;
@@ -300,7 +315,11 @@ void GameState::updateButtons(const float& dt) {
 			it.second->update(this->mousePosView);
 		//Attack
 		if (this->buttons["ATTACK1"]->isPressed() && this->getKeytime())
-			checkHit(PLAYER, dt);
+			checkHit(PLAYER, 1, dt);
+		if (this->buttons["ATTACK2"]->isPressed() && this->getKeytime())
+			checkHit(PLAYER, 2, dt);
+		if (this->buttons["ATTACK3"]->isPressed() && this->getKeytime())
+			checkHit(PLAYER, 3, dt);
 
 		//Spawn enemy
 		if (this->buttons["ENEMY"]->isPressed() && this->getKeytime())
@@ -373,18 +392,18 @@ void GameState::renderButtons(sf::RenderTarget& target) {
 
 
 
-void GameState::checkHit(bool type, const float& dt) {
+void GameState::checkHit(bool type, int attackType, const float& dt) {
 
 	if (this->enemy && this->playerRound)
-		this->attack(type, dt);
+		this->attack(type, attackType, dt);
 	else
 		this->renderMissText(dt);
 
 }
 
-void GameState::attack(bool type, const float& dt) {
+void GameState::attack(bool type, int attackType,const float& dt) {
 
-	this->player->setIsAttacking();
+	this->player->setIsAttacking(attackType);
 
 	this->enemy->getDamage(this->player->doDamage());
 	this->enemy->setIsHurting();

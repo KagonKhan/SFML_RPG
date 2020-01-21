@@ -49,8 +49,8 @@ void Entity::updateHpBar() {
 	this->hpBar.setPosition(sf::Vector2f(this->sprite.getPosition().x + 10.f, this->sprite.getPosition().y));
 }
 
-void Entity::deathAnimation(const float& dt) {
-	this->animationComponent->play("DEATH", dt, true);
+bool Entity::deathAnimation(const float& dt) {
+	return this->animationComponent->play("DEATH", dt, true);
 }
 
 void Entity::initVariables() {
